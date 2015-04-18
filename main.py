@@ -1,6 +1,7 @@
 import pygame
 import sys
 from pygame.locals import *
+import json
 
 from level import Level
 from character import Character
@@ -9,7 +10,13 @@ from physics_manager import PhysicsManager
 
 TILESIZE = 10
 
-level1 = Level("levels/first.lvl")
+config_handle = open("settings.cfg", "r")
+config = json.load(config_handle)
+config_handle.close()
+
+USER_MOTION_SPEED, USER_JUMP_SPEED = config["user_motion_speed"], config["user_jump_speed"]
+
+level1 = Level("{0}/first.lvl".format(config["levels_dir"]))
 mainChar = Character.genMainCharacter()
 inputs = InputManager()
 physics = PhysicsManager(level1.width, level1.height)
@@ -20,9 +27,6 @@ pygame.init()
 surface = pygame.display.set_mode((level1.width*TILESIZE,level1.height*TILESIZE))
 
 clock = pygame.time.Clock()
-
-USER_MOTION_SPEED = 3
-USER_JUMP_SPEED = 5
 
 while True:
 
