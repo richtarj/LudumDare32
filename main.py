@@ -4,27 +4,48 @@ from pygame.locals import *
 
 from level import Level
 from character import Character
+from input_manager import InputManager, Actions
 
-MAPWIDTH = 100
-MAPHEIGHT = 60
 TILESIZE = 10
 
 level1 = Level("levels/first.lvl", TILESIZE)
+bounds = level1.surface.get_rect()
 mainChar = Character.genMainCharacter(TILESIZE)
+inputs = InputManager()
 
 pygame.init()
 surface = pygame.display.set_mode((level1.width*TILESIZE,level1.height*TILESIZE))
 
+clock = pygame.time.Clock()
+
 while True:
-    for event in pygame.event.get():
-        if event.type == QUIT:
+
+    clock.tick()
+    delta = clock.get_time() / 1000.0
+
+    for event in inputs.eventQueue():
+        if event == Actions.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == KEYDOWN:
-            if(event.key == K_q):
-                pygame.quit()
-                sys.exit()
+        elif event == Actions.START_USER_LEFT:
+            mainChar.movingLeft = True
+        elif event == Actions.START_USER_RIGHT:
+            mainChar.movingRight = True
+        elif event == Actions.START_USER_UP:
+            mainChar.movingUp = True
+        elif event == Actions.START_USER_DOWN:
+            mainChar.movingDown = True
+        elif event == Actions.STOP_USER_LEFT:
+            mainChar.movingLeft = False
+        elif event == Actions.STOP_USER_RIGHT:
+            mainChar.movingRight = False
+        elif event == Actions.STOP_USER_UP:
+            mainChar.movingUp = False
+        elif event == Actions.STOP_USER_DOWN:
+            mainChar.movingDown = False
+
+    mainChar.update(delta, bounds)
 
     surface.blit(level1.surface, (0,0))
-    surface.blit(mainChar.surface, (20, 20))
+    surface.blit(mainChar.surface, mainChar.position)
     pygame.display.update()
