@@ -2,20 +2,20 @@ import pygame
 import sys
 from pygame.locals import *
 
-MAPWIDTH = 50
-MAPHEIGHT = 50
+from level import Level
+
+MAPWIDTH = 100
+MAPHEIGHT = 60
 TILESIZE = 10
 
+level1 = Level("levels/first.lvl", 10)
+
 pygame.init()
-surface = pygame.display.set_mode((MAPWIDTH*TILESIZE,MAPHEIGHT*TILESIZE))
+surface = pygame.display.set_mode((level1.width*TILESIZE,level1.height*TILESIZE))
 
 while True:
-
-    #get all the user events
     for event in pygame.event.get():
-        #if the user wants to quit
         if event.type == QUIT:
-            #and the game and close the window
             pygame.quit()
             sys.exit()
         if event.type == KEYDOWN:
@@ -23,12 +23,5 @@ while True:
                 pygame.quit()
                 sys.exit()
 
-    #loop through each row
-    for row in range(MAPHEIGHT):
-        #loop through each column in the row
-        for column in range(MAPWIDTH):
-            #draw the resource at that position in the tilemap, using the correct colour
-            pygame.draw.rect(surface, (255, 0, 0), (column*TILESIZE,row*TILESIZE,TILESIZE,TILESIZE))
-
-    #update the display
+    surface.blit(level1.surface, (0,0))
     pygame.display.update()
