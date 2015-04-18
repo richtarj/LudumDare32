@@ -4,50 +4,50 @@ class Character(object):
     MAIN_CHARACTER = ("characters/dumb.jpg", 5, 6)
 
     surface = None
-    position = (0.0,0.0)
-    _tileSize = 0
+    _widthInTiles, _heightInTiles = None, None
+    positionInTiles = [0.0,0.0]
+    _tileSize = None
     TILES_IN_SECOND = 10
 
     movingUp, movingRight, movingDown, movingLeft = False, False, False, False
 
-    def __init__(self, (imageName, wTiles, hTiles), tileSize):
-        self.surface = pygame.image.load(imageName)
-        self._tileSize = tileSize
-
-        self.surface = pygame.transform.smoothscale(self.surface, (wTiles*tileSize, hTiles*tileSize))
+    def __init__(self, (imageName, wTiles, hTiles)):
+        self._baseSurface = pygame.image.load(imageName)
+        self._widthInTiles = wTiles
+        self._heightInTiles = hTiles
 
     @staticmethod
-    def genMainCharacter(tileSize):
-        return Character(Character.MAIN_CHARACTER, tileSize)
+    def genMainCharacter():
+        return Character(Character.MAIN_CHARACTER)
 
     def _deltaToDistance(self, delta):
-        return delta * self.TILES_IN_SECOND * self._tileSize
+        return delta * self.TILES_IN_SECOND
 
     def moveUp(self, delta, bounds):
-        newY = self.position[1] - self._deltaToDistance(delta)
-        if(newY < 0):
-            newY = 0
-        self.position = (self.position[0], newY)
+        self.positionInTiles[1] = self.positionInTiles[1] - self._deltaToDistance(delta)
+        if(self.positionInTiles[1] < 0):
+            self.positionInTiles[1] = 0.0
 
     def moveRight(self, delta, bounds):
-        newX = self.position[0] + self._deltaToDistance(delta)
-        if(newX + self.surface.get_width() > bounds.right):
-            newX = bounds.right - self.surface.get_width()
-        self.position = (newX, self.position[1])
+        self.positionInTiles[0] = self.positionInTiles[0] + self._deltaToDistance(delta)
+        if(self.positionInTiles[0] + self.surface.get_width() > bounds.right):
+            self.positionInTiles[0] = bounds.right - self.surface.get_width()
 
     def moveDown(self, delta, bounds):
-        newY = self.position[1] + self._deltaToDistance(delta)
-        if(newY + self.surface.get_height() > bounds.bottom):
-            newY = bounds.bottom - self.surface.get_height()
-        self.position = (self.position[0], newY)
+        self.positionInTiles[1] = self.positionInTiles[1] + self._deltaToDistance(delta)
+        if(self.positionInTiles[1] + self.surface.get_height() > bounds.bottom):
+            self.positionInTiles[1] = bounds.bottom - self.surface.get_height()
 
     def moveLeft(self, delta, bounds):
-        newX = self.position[0] - self._deltaToDistance(delta)
-        if(newX < 0):
-            newX = 0
-        self.position = (newX, self.position[1])
+        self.positionInTiles[0] = self.positionInTiles[0] - self._deltaToDistance(delta)
+        if(self.positionInTiles[0] < 0):
+            self.positionInTiles[0] = 0.0
 
-    def update(self, delta, bounds):
+    def update(self, delta, tileSize, bounds):
+        if tileSize != self._tileSize:
+            self.surface = pygame.transform.smoothscale(self._baseSurface, (self._widthInTiles*tileSize, self._heightInTiles*tileSize))
+            self._tileSize = tileSize
+
         if self.movingUp:
             self.moveUp(delta, bounds)
         if self.movingRight:
@@ -56,3 +56,6 @@ class Character(object):
             self.moveDown(delta, bounds)
         if self.movingLeft:
             self.moveLeft(delta, bounds)
+
+        self.position = (self.positionInTiles[0] * self._tileSize, self.positionInTiles[1] * self._tileSize)
+        

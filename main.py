@@ -8,9 +8,8 @@ from input_manager import InputManager, Actions
 
 TILESIZE = 10
 
-level1 = Level("levels/first.lvl", TILESIZE)
-bounds = level1.surface.get_rect()
-mainChar = Character.genMainCharacter(TILESIZE)
+level1 = Level("levels/first.lvl")
+mainChar = Character.genMainCharacter()
 inputs = InputManager()
 
 pygame.init()
@@ -44,7 +43,8 @@ while True:
         elif event == Actions.STOP_USER_DOWN:
             mainChar.movingDown = False
 
-    mainChar.update(delta, bounds)
+    mainChar.update(delta, TILESIZE, level1.surface.get_rect())
+    level1.update(TILESIZE)
 
     surface.blit(level1.surface, (0,0))
     surface.blit(mainChar.surface, mainChar.position)

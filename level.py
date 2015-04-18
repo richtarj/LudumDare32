@@ -4,22 +4,26 @@ import pygame
 class Level(object):
     _levelDef = None
     surface = None
-    tileSize = 0
+    _tileSize = None
 
-    def __init__(self, levelName, tileSize):
+    def __init__(self, levelName):
         with open(levelName, "r") as levelData:
             self._levelDef = json.load(levelData)
-            self.tileSize = tileSize
             self.width = self._levelDef['w']
             self.height = self._levelDef['h']
 
-            self.surface = pygame.Surface((self.width*tileSize, self.height*tileSize))
+            self.surface = pygame.Surface((self.width, self.height))
             pixels = pygame.PixelArray(self.surface)
 
             for item in self._levelDef['map']:
-                x = item['x'] * tileSize
-                y = item['y'] * tileSize
+                x = item['x']
+                y = item['y']
                 color = tuple(self._levelDef['materials'][item['mat']])
-                for dx in range(0, item['w'] * tileSize):
-                    for dy in range(0, item['h'] * tileSize):
+                for dx in range(0, item['w']):
+                    for dy in range(0, item['h']):
                         pixels[x+dx, y+dy] = color
+
+    def update(self, tileSize):
+        if(tileSize != self._tileSize):
+            self.surface = pygame.transform.scale(self.surface, (self.width * tileSize, self.height * tileSize))
+            self._tileSize = tileSize
