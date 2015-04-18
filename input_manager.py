@@ -19,9 +19,9 @@ class InputManager(object):
     def eventQueue(self):
         for event in pygame.event.get():
             #User quits
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_q):
+            if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_q or event.key == K_ESCAPE)):
                 yield Actions.QUIT
-
+            
             elif event.type == KEYDOWN:
                 if event.key == K_UP:
                     yield Actions.START_USER_UP

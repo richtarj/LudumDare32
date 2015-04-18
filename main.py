@@ -5,17 +5,24 @@ from pygame.locals import *
 from level import Level
 from character import Character
 from input_manager import InputManager, Actions
+from physics_manager import PhysicsManager
 
 TILESIZE = 10
 
 level1 = Level("levels/first.lvl")
 mainChar = Character.genMainCharacter()
 inputs = InputManager()
+physics = PhysicsManager(level1.width, level1.height)
+
+physics.add_actor(mainChar, has_gravity=True)
 
 pygame.init()
 surface = pygame.display.set_mode((level1.width*TILESIZE,level1.height*TILESIZE))
 
 clock = pygame.time.Clock()
+
+USER_MOTION_SPEED = 3
+USER_JUMP_SPEED = 5
 
 while True:
 
@@ -27,23 +34,20 @@ while True:
             pygame.quit()
             sys.exit()
         elif event == Actions.START_USER_LEFT:
-            mainChar.movingLeft = True
+            physics.add_velocity_x(mainChar, -USER_MOTION_SPEED)
         elif event == Actions.START_USER_RIGHT:
-            mainChar.movingRight = True
+            physics.add_velocity_x(mainChar, USER_MOTION_SPEED)
         elif event == Actions.START_USER_UP:
-            mainChar.movingUp = True
-        elif event == Actions.START_USER_DOWN:
-            mainChar.movingDown = True
+            if physics.get_velocity_y(mainChar) == 0:
+                physics.add_velocity_y(mainChar, -USER_JUMP_SPEED)
         elif event == Actions.STOP_USER_LEFT:
-            mainChar.movingLeft = False
+            physics.add_velocity_x(mainChar, USER_MOTION_SPEED)
         elif event == Actions.STOP_USER_RIGHT:
-            mainChar.movingRight = False
-        elif event == Actions.STOP_USER_UP:
-            mainChar.movingUp = False
-        elif event == Actions.STOP_USER_DOWN:
-            mainChar.movingDown = False
+            physics.add_velocity_x(mainChar, -USER_MOTION_SPEED)
 
-    mainChar.update(delta, TILESIZE, level1.surface.get_rect())
+    physics.update(delta, TILESIZE)
+
+    mainChar.update(delta, TILESIZE)
     level1.update(TILESIZE)
 
     surface.blit(level1.surface, (0,0))
