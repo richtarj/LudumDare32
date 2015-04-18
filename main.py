@@ -28,6 +28,10 @@ surface = pygame.display.set_mode((level1.width*TILESIZE,level1.height*TILESIZE)
 
 clock = pygame.time.Clock()
 
+
+pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
+userSounds = SoundManager()
+
 while True:
 
     clock.tick()
@@ -39,15 +43,20 @@ while True:
             sys.exit()
         elif event == Actions.START_USER_LEFT:
             physics.add_velocity_x(mainChar, -USER_MOTION_SPEED)
+            userSounds.start_cont_effect("run")
         elif event == Actions.START_USER_RIGHT:
             physics.add_velocity_x(mainChar, USER_MOTION_SPEED)
+            userSounds.start_cont_effect("run")
         elif event == Actions.START_USER_UP:
             if physics.get_velocity_y(mainChar) == 0:
                 physics.add_velocity_y(mainChar, -USER_JUMP_SPEED)
+                userSounds.play_one_sound_effect("jump")
         elif event == Actions.STOP_USER_LEFT:
             physics.add_velocity_x(mainChar, USER_MOTION_SPEED)
+            userSounds.stop_cont_effect()
         elif event == Actions.STOP_USER_RIGHT:
             physics.add_velocity_x(mainChar, -USER_MOTION_SPEED)
+            userSounds.stop_cont_effect()
 
     physics.update(delta, TILESIZE)
 
